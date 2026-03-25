@@ -13,7 +13,7 @@ import stripe
 import json
 
 
-from src import apps, schemas
+from src import app, schemas
 
 router = APIRouter(
     tags = ['User Interface']
@@ -39,7 +39,7 @@ async def index(request: Request, response_model=HTMLResponse):
 async def products_index(request: Request, response_model=HTMLResponse):
     featured_product_slug = 'featured'
     base_url = request.base_url
-    product_url = apps.product_router.url_path_for("get_product_by_slug", slug=featured_product_slug)
+    product_url = app.product_router.url_path_for("get_product_by_slug", slug=featured_product_slug)
     request_url = base_url.__str__() + product_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -47,7 +47,7 @@ async def products_index(request: Request, response_model=HTMLResponse):
 
     featured_product = response.json()
 
-    products_url = apps.product_router.url_path_for("get_products")
+    products_url = app.product_router.url_path_for("get_products")
     request_url2 = base_url.__str__() + products_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -102,7 +102,7 @@ async def products_index(request: Request, response_model=HTMLResponse):
 @router.get("/products/{product_slug}", status_code=status.HTTP_200_OK)
 async def product_info(product_slug: str, request: Request, response_model=HTMLResponse):
     base_url = request.base_url
-    product_url = apps.product_router.url_path_for("get_product_by_slug", slug=product_slug)
+    product_url = app.product_router.url_path_for("get_product_by_slug", slug=product_slug)
     request_url = base_url.__str__() + product_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -142,7 +142,7 @@ def cancelled(request: Request):
 @router.get("/create-checkout-session/{path}/")
 async def create_checkout_session(path, request: Request):
     base_url = request.base_url
-    product_url = apps.product_router.url_path_for("get_product_by_slug", slug=path)
+    product_url = app.product_router.url_path_for("get_product_by_slug", slug=path)
     request_url = base_url.__str__() + product_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
