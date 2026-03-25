@@ -17,4 +17,4 @@ class ProductBase(BaseModel):
 class Product(ProductBase):
     slug: str
     class Config:
-        orm_mode = True
+        from_attributes = True

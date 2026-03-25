@@ -1,7 +1,7 @@
 import stripe
 from fastapi import APIRouter, HTTPException, status, Request
 from fastapi.responses import RedirectResponse
-from src import app
+from src import apps
 from src.config import settings
 
 router = APIRouter(
@@ -40,7 +40,7 @@ def authorize_stripe(request: Request):
         stripe_user_id = response['stripe_user_id']
         access_token = response['access_token']
 
-        redirect = RedirectResponse(url=app.ui_router.url_path_for('products_index'))
+        redirect = RedirectResponse(url=apps.ui_router.url_path_for('products_index'))
         redirect.status_code = 302
         redirect.set_cookie('Stripe-Account', access_token)
         redirect.set_cookie('Stripe-User-ID', stripe_user_id)
@@ -67,7 +67,7 @@ def deauthorize_stripe(request: Request):
             stripe_user_id=stripe_user_id
         )
 
-        redirect = RedirectResponse(url=app.ui_router.url_path_for('index'))
+        redirect = RedirectResponse(url=apps.ui_router.url_path_for('index'))
         redirect.status_code = 302
         redirect.set_cookie('Stripe-Account', '')
         redirect.set_cookie('Stripe-User-ID', '')

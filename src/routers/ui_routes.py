@@ -13,7 +13,7 @@ import stripe
 import json
 
 
-from src import app, schemas
+from src import apps, schemas
 
 router = APIRouter(
     tags = ['User Interface']
@@ -33,13 +33,13 @@ stripe_keys = {
 
 @router.get("/", status_code=status.HTTP_200_OK)
 async def index(request: Request, response_model=HTMLResponse):
-    return TEMPLATES.TemplateResponse("pages/index.html", {"request" : request})
+    return TEMPLATES.TemplateResponse(name="pages/index.html", request =request)
 
 @router.get("/products/", status_code=status.HTTP_200_OK)
 async def products_index(request: Request, response_model=HTMLResponse):
     featured_product_slug = 'featured'
     base_url = request.base_url
-    product_url = app.product_router.url_path_for("get_product_by_slug", slug=featured_product_slug)
+    product_url = apps.product_router.url_path_for("get_product_by_slug", slug=featured_product_slug)
     request_url = base_url.__str__() + product_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -47,7 +47,7 @@ async def products_index(request: Request, response_model=HTMLResponse):
 
     featured_product = response.json()
 
-    products_url = app.product_router.url_path_for("get_products")
+    products_url = apps.product_router.url_path_for("get_products")
     request_url2 = base_url.__str__() + products_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -94,16 +94,15 @@ async def products_index(request: Request, response_model=HTMLResponse):
             json_product = json.dumps( product, indent=4, separators=(',', ': ') )
             json_data.append(json_product)
 
-    return TEMPLATES.TemplateResponse("ecommerce/index.html", {
-        "request" : request,
-        "featured_product" : featured_product,
-        "products": products,
-    })
+    return TEMPLATES.TemplateResponse(name="ecommerce/index.html",
+        request= request,
+        context={ "featured_product": featured_product,"products": products}
+    )
 
 @router.get("/products/{product_slug}", status_code=status.HTTP_200_OK)
 async def product_info(product_slug: str, request: Request, response_model=HTMLResponse):
     base_url = request.base_url
-    product_url = app.product_router.url_path_for("get_product_by_slug", slug=product_slug)
+    product_url = apps.product_router.url_path_for("get_product_by_slug", slug=product_slug)
     request_url = base_url.__str__() + product_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -115,11 +114,10 @@ async def product_info(product_slug: str, request: Request, response_model=HTMLR
 
     product = response.json()
 
-    return TEMPLATES.TemplateResponse("ecommerce/template.html", {
-        "request" : request,
-        "product": product,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="ecommerce/template.html",
+        request = request,
+        context={ "product": product,"config": settings}
+)
 
 @router.get("/config")
 def get_publishable_key():
@@ -128,23 +126,23 @@ def get_publishable_key():
 
 @router.get("/success")
 def success(request: Request):
-    return TEMPLATES.TemplateResponse("ecommerce/payment-success.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse("ecommerce/payment-success.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get("/cancelled")
 def cancelled(request: Request):
-    return TEMPLATES.TemplateResponse("ecommerce/payment-cancelled.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="ecommerce/payment-cancelled.html",
+        request =request,
+        context={"config": settings}
+    )
 
 
 @router.get("/create-checkout-session/{path}/")
 async def create_checkout_session(path, request: Request):
     base_url = request.base_url
-    product_url = app.product_router.url_path_for("get_product_by_slug", slug=path)
+    product_url = apps.product_router.url_path_for("get_product_by_slug", slug=path)
     request_url = base_url.__str__() + product_url.__str__()[1:]
 
     http3client = http3.AsyncClient()
@@ -188,185 +186,185 @@ async def create_checkout_session(path, request: Request):
 
 @router.get("/success")
 def success(request: Request):
-    return TEMPLATES.TemplateResponse("ecommerce/payment-success.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="ecommerce/payment-success.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get("/presentation")
 def presentation(request: Request):
-    return TEMPLATES.TemplateResponse("pages/presentation.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/presentation.html",
+        request =request,
+        context={"config": settings}
+    )
 
 
 @router.get("/page-about-us")
 def page_about_us(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-about-us.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-about-us.html",
+        request =request,
+        context={"config": settings}
+    )
 
 
 @router.get('/page-contact-us')
 def page_contact_us(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-contact-us.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-contact-us.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/page-author')
 def page_author(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-author.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-author.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/page-sign-in')
 def page_sign_in(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-sign-in.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-sign-in.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/page-sign-up')
 def page_sign_up(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-sign-up.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-sign-up.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/page-404')
 def page_404(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-404.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-404.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/page-sections-hero-sections')
 def page_sections_hero_sections(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-sections-hero-sections.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-sections-hero-sections.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/page-sections-features')
 def page_sections_features(request: Request):
-    return TEMPLATES.TemplateResponse("pages/page-sections-features.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/page-sections-features.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/navigation-navbars')
 def navigation_navbars(request: Request):
-    return TEMPLATES.TemplateResponse("pages/navigation-navbars.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/navigation-navbars.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/navigation-nav-tabs')
 def navigation_nav_tabs(request: Request):
-    return TEMPLATES.TemplateResponse("pages/navigation-nav-tabs.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/navigation-nav-tabs.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/navigation-pagination')
 def navigation_pagination(request: Request):
-    return TEMPLATES.TemplateResponse("pages/navigation-pagination.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/navigation-pagination.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/input-areas-inputs')
 def input_areas_inputs(request: Request):
-    return TEMPLATES.TemplateResponse("pages/input-areas-inputs.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/input-areas-inputs.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/input-areas-forms')
 def input_areas_forms(request: Request):
-    return TEMPLATES.TemplateResponse("pages/input-areas-forms.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/input-areas-forms.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/attention-catchers-alerts')
 def attention_catchers_alerts(request: Request):
-    return TEMPLATES.TemplateResponse("pages/attention-catchers-alerts.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/attention-catchers-alerts.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/attention-catchers-modals')
 def attention_catchers_modals(request: Request):
-    return TEMPLATES.TemplateResponse("pages/attention-catchers-modals.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/attention-catchers-modals.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/attention-catchers-tooltips-popovers')
 def attention_catchers_tooltips_popovers(request: Request):
-    return TEMPLATES.TemplateResponse("pages/attention-catchers-tooltips-popovers.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/attention-catchers-tooltips-popovers.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-buttons')
 def elements_buttons(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-buttons.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-buttons.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-avatars')
 def elements_avatars(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-avatars.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-avatars.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-dropdowns')
 def elements_dropdowns(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-dropdowns.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-dropdowns.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-toggles')
 def elements_toggles(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-toggles.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-toggles.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-breadcrumbs')
 def elements_breadcrumbs(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-breadcrumbs.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-breadcrumbs.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-badges')
 def elements_badges(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-badges.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-badges.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-typography')
 def elements_typography(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-typography.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-typography.html",
+        request =request,
+        context={"config": settings}
+    )
 
 @router.get('/elements-progress-bars')
 def elements_progress_bars(request: Request):
-    return TEMPLATES.TemplateResponse("pages/elements-progress-bars.html", {
-        "request" : request,
-        "config" : settings
-    })
+    return TEMPLATES.TemplateResponse(name="pages/elements-progress-bars.html",
+        request =request,
+        context={"config": settings}
+    )
 
